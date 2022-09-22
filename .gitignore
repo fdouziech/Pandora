@@ -1,12 +1,33 @@
-# Python
+# Cache python
 __pycache__/
+
+# Compiled python files
+*.py[cod]
+*$py.class
+*.pyc
+.eggs/
+
+# Pytest
+.pytest_cache/
+pytest-report.xml
+
+# Python coverage output
 .coverage
 coverage.xml
 nosetests.xml
-pylint-report.txt
-doc/build/
-*.egg-info/
 
-# Jupyter
-.ipynb_checkpoints/
-output/
+# doc
+doc/build/
+
+# pylint report
+pylint-report.txt
+
+# Setuptools build and distribution directories
+/dist/
+/build/
+
+# Virtualenv
+/venv/
+
+# notebooks output:
+/notebooks/output/

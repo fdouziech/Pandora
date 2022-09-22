@@ -25,7 +25,6 @@ jobs:
         make install-ci
     - name: Test with pytest
       run: |
-        export NUMBA_DISABLE_JIT=1
         make test-ci
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1

@@ -22,11 +22,6 @@ endif
 # Check CMAKE variables before venv creation
 CHECK_CMAKE = $(shell command -v cmake 2> /dev/null)
 
-# Check python install in VENV
-CHECK_NUMPY = $(shell ${PANDORA_VENV}/bin/python -m pip list|grep numpy)
-CHECK_RASTERIO = $(shell ${PANDORA_VENV}/bin/python -m pip list|grep rasterio)
-CHECK_NUMBA = $(shell ${PANDORA_VENV}/bin/python -m pip list|grep numba)
-
 
 # Check Docker
 CHECK_DOCKER = $(shell docker -v)
@@ -54,14 +49,8 @@ venv: check ## create virtualenv in PANDORA_VENV directory if not exists
 	@${PANDORA_VENV}/bin/python -m pip install --upgrade pip setuptools # no check to upgrade each time
 	@touch ${PANDORA_VENV}/bin/activate
 
-.PHONY: install-deps
-install-deps: venv
-	@[ "${CHECK_NUMPY}" ] ||${PANDORA_VENV}/bin/python -m pip install --upgrade cython numpy
-	@[ "${CHECK_RASTERIO}" ] ||${PANDORA_VENV}/bin/python -m pip install --no-binary rasterio rasterio
-	@[ "${CHECK_NUMBA}" ] ||${PANDORA_VENV}/bin/python -m pip install --upgrade numba
-	
 .PHONY: install
-install: install-deps  ## install pandora (not editable) with dev, docs, notebook dependencies
+install: venv  ## install pandora (not editable) with dev, docs, notebook dependencies
 	@test -f ${PANDORA_VENV}/bin/pandora || ${PANDORA_VENV}/bin/pip install .[dev,docs,notebook]
 	@test -f .git/hooks/pre-commit || echo "  Install pre-commit hook"
 	@test -f .git/hooks/pre-commit || ${PANDORA_VENV}/bin/pre-commit install -t pre-commit
@@ -70,7 +59,7 @@ install: install-deps  ## install pandora (not editable) with dev, docs, noteboo
 	@echo "PANDORA venv usage : source ${PANDORA_VENV}/bin/activate; pandora -h"
 
 .PHONY: install-dev
-install-dev: install-deps ## install pandora in dev editable mode (pip install -e .)
+install-dev: venv ## install pandora in dev editable mode (pip install -e .)
 	@test -f ${PANDORA_VENV}/bin/pandora || ${PANDORA_VENV}/bin/pip install -e .[dev,docs,notebook]
 	@test -f .git/hooks/pre-commit || echo "  Install pre-commit hook"
 	@test -f .git/hooks/pre-commit || ${PANDORA_VENV}/bin/pre-commit install -t pre-commit
@@ -83,14 +72,11 @@ install-dev: install-deps ## install pandora in dev editable mode (pip install -
 .PHONY: install-ci-deps
 install-ci-deps:
 	@python -m pip install --upgrade pip
-	@pip install pytest
-	@pip install pytest-cov
-	@pip install codecov
 	@pip install build
 
 .PHONY: install-ci
 install-ci:
-	@pip install .
+	@pip install .[dev]
 
 .PHONY: distribute
 distribute:
@@ -98,6 +84,7 @@ distribute:
 
 .PHONY: test-ci
 test-ci:
+	@export NUMBA_DISABLE_JIT=1
 	@pytest -m "not notebook_tests" --junitxml=pytest-report.xml --cov-config=.coveragerc --cov-report xml --cov
 
 ## Test section
