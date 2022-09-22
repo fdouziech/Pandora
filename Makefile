@@ -69,13 +69,9 @@ install-dev: venv ## install pandora in dev editable mode (pip install -e .)
 
 ## Install section for ci
 
-.PHONY: install-ci-deps
-install-ci-deps:
-	@python -m pip install --upgrade pip
-	@pip install build
-
 .PHONY: install-ci
 install-ci:
+	@python -m pip install --upgrade pip
 	@pip install .[dev]
 
 .PHONY: distribute
