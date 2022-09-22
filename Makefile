@@ -89,16 +89,15 @@ install-ci-deps:
 	@pip install build
 
 .PHONY: install-ci
-install-ci: install-ci-deps
+install-ci:
 	@pip install .
 
 .PHONY: distribute
-distribute: install-ci
+distribute:
 	@python -m build --sdist
 
 .PHONY: test-ci
-test-ci: install
-	@export  NUMBA_DISABLE_JIT=1
+test-ci:
 	@pytest -m "not notebook_tests" --junitxml=pytest-report.xml --cov-config=.coveragerc --cov-report xml --cov
 
 ## Test section
